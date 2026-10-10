@@ -50,7 +50,8 @@ class LineSearchOptimizer:
         assert best is not None
         lat, lng, walk_m, veh_s, meet_s = best
         return OptimizeResponse(
-            rendezvous=LatLng(lat=lat, lng=lng),
+            # 소수 6자리 ≈ 0.1 m — 보간 계산의 부동소수점 잔여값(37.550999999…)을 정리
+            rendezvous=LatLng(lat=round(lat, 6), lng=round(lng, 6)),
             walk_distance_m=round(walk_m, 1),
             walk_eta_s=round(walk_m / settings.walk_speed_mps, 1),
             vehicle_eta_s=None if veh_s is None else round(veh_s, 1),
