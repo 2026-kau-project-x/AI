@@ -18,3 +18,18 @@ jobs:
           cache-dependency-path: requirements-dev.txt
       - run: pip install -r requirements-dev.txt
       - run: pytest -q
+
+  docker:
+    # Dockerfile 이 실제로 빌드·기동되는지 확인 (컨테이너를 띄우고 /health 응답까지 본다)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t px-ai .
+      - run: docker run -d --name px-ai -p 8001:8001 px-ai
+      - run: |
+          for i in $(seq 1 30); do
+            curl -sf localhost:8001/api/v1/health && exit 0
+            sleep 1
+          done
+          docker logs px-ai
+          exit 1
